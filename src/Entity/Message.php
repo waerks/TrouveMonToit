@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MessageRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -23,6 +25,24 @@ class Message
     #[ORM\ManyToOne(inversedBy: 'messages')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Annonce $annonce = null;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'messagesEnvoyes', orphanRemoval: true)]
+    private Collection $expediteur;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'messagesRecus', orphanRemoval: true)]
+    private Collection $destinataire;
+
+    public function __construct()
+    {
+        $this->expediteur = new ArrayCollection();
+        $this->destinataire = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -61,6 +81,66 @@ class Message
     public function setAnnonce(?Annonce $annonce): static
     {
         $this->annonce = $annonce;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getExpediteur(): Collection
+    {
+        return $this->expediteur;
+    }
+
+    public function addExpediteur(User $expediteur): static
+    {
+        if (!$this->expediteur->contains($expediteur)) {
+            $this->expediteur->add($expediteur);
+            $expediteur->setMessagesEnvoyes($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExpediteur(User $expediteur): static
+    {
+        if ($this->expediteur->removeElement($expediteur)) {
+            // set the owning side to null (unless already changed)
+            if ($expediteur->getMessagesEnvoyes() === $this) {
+                $expediteur->setMessagesEnvoyes(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getDestinataire(): Collection
+    {
+        return $this->destinataire;
+    }
+
+    public function addDestinataire(User $destinataire): static
+    {
+        if (!$this->destinataire->contains($destinataire)) {
+            $this->destinataire->add($destinataire);
+            $destinataire->setMessagesRecus($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDestinataire(User $destinataire): static
+    {
+        if ($this->destinataire->removeElement($destinataire)) {
+            // set the owning side to null (unless already changed)
+            if ($destinataire->getMessagesRecus() === $this) {
+                $destinataire->setMessagesRecus(null);
+            }
+        }
 
         return $this;
     }

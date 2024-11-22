@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ProximiteRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProximiteRepository::class)]
@@ -15,6 +17,17 @@ class Proximite
 
     #[ORM\Column(length: 255)]
     private ?string $type_proximite = null;
+
+    /**
+     * @var Collection<int, Localisation>
+     */
+    #[ORM\OneToMany(targetEntity: Localisation::class, mappedBy: 'proximites', orphanRemoval: true)]
+    private Collection $localisations;
+
+    public function __construct()
+    {
+        $this->localisations = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -29,6 +42,36 @@ class Proximite
     public function setTypeProximite(string $type_proximite): static
     {
         $this->type_proximite = $type_proximite;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Localisation>
+     */
+    public function getLocalisations(): Collection
+    {
+        return $this->localisations;
+    }
+
+    public function addLocalisation(Localisation $localisation): static
+    {
+        if (!$this->localisations->contains($localisation)) {
+            $this->localisations->add($localisation);
+            $localisation->setProximites($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLocalisation(Localisation $localisation): static
+    {
+        if ($this->localisations->removeElement($localisation)) {
+            // set the owning side to null (unless already changed)
+            if ($localisation->getProximites() === $this) {
+                $localisation->setProximites(null);
+            }
+        }
 
         return $this;
     }

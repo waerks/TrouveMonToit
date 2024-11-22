@@ -32,6 +32,10 @@ class Energie
     #[ORM\OneToOne(mappedBy: 'energie', cascade: ['persist', 'remove'])]
     private ?Annonce $annonce = null;
 
+    #[ORM\ManyToOne(inversedBy: 'energies')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Chauffage $chauffages = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -110,6 +114,18 @@ class Energie
         }
 
         $this->annonce = $annonce;
+
+        return $this;
+    }
+
+    public function getChauffages(): ?Chauffage
+    {
+        return $this->chauffages;
+    }
+
+    public function setChauffages(?Chauffage $chauffages): static
+    {
+        $this->chauffages = $chauffages;
 
         return $this;
     }

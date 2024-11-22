@@ -34,6 +34,10 @@ class Localisation
     #[ORM\OneToOne(mappedBy: 'localisation', cascade: ['persist', 'remove'])]
     private ?Annonce $annonce = null;
 
+    #[ORM\ManyToOne(inversedBy: 'localisations')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Proximite $proximites = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -124,6 +128,18 @@ class Localisation
         }
 
         $this->annonce = $annonce;
+
+        return $this;
+    }
+
+    public function getProximites(): ?Proximite
+    {
+        return $this->proximites;
+    }
+
+    public function setProximites(?Proximite $proximites): static
+    {
+        $this->proximites = $proximites;
 
         return $this;
     }

@@ -39,9 +39,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Annonce::class, mappedBy: 'createur', orphanRemoval: true)]
     private Collection $annonces;
 
+    #[ORM\Column(length: 255)]
+    private ?string $nom = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $prenom = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $telephone = null;
+
+    /**
+     * @var Collection<int, Favori>
+     */
+    #[ORM\OneToMany(targetEntity: Favori::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $favoris;
+
+    #[ORM\ManyToOne(inversedBy: 'expediteur')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Message $messagesEnvoyes = null;
+
+    #[ORM\ManyToOne(inversedBy: 'destinataire')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Message $messagesRecus = null;
+
     public function __construct()
     {
         $this->annonces = new ArrayCollection();
+        $this->favoris = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -145,6 +169,96 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $annonce->setCreateur(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): static
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+
+    public function setPrenom(string $prenom): static
+    {
+        $this->prenom = $prenom;
+
+        return $this;
+    }
+
+    public function getTelephone(): ?string
+    {
+        return $this->telephone;
+    }
+
+    public function setTelephone(?string $telephone): static
+    {
+        $this->telephone = $telephone;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Favori>
+     */
+    public function getFavoris(): Collection
+    {
+        return $this->favoris;
+    }
+
+    public function addFavori(Favori $favori): static
+    {
+        if (!$this->favoris->contains($favori)) {
+            $this->favoris->add($favori);
+            $favori->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFavori(Favori $favori): static
+    {
+        if ($this->favoris->removeElement($favori)) {
+            // set the owning side to null (unless already changed)
+            if ($favori->getUser() === $this) {
+                $favori->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getMessagesEnvoyes(): ?Message
+    {
+        return $this->messagesEnvoyes;
+    }
+
+    public function setMessagesEnvoyes(?Message $messagesEnvoyes): static
+    {
+        $this->messagesEnvoyes = $messagesEnvoyes;
+
+        return $this;
+    }
+
+    public function getMessagesRecus(): ?Message
+    {
+        return $this->messagesRecus;
+    }
+
+    public function setMessagesRecus(?Message $messagesRecus): static
+    {
+        $this->messagesRecus = $messagesRecus;
 
         return $this;
     }

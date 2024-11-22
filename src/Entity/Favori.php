@@ -21,6 +21,10 @@ class Favori
     #[ORM\JoinColumn(nullable: false)]
     private ?Annonce $annonce = null;
 
+    #[ORM\ManyToOne(inversedBy: 'favoris')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -46,6 +50,18 @@ class Favori
     public function setAnnonce(?Annonce $annonce): static
     {
         $this->annonce = $annonce;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }
