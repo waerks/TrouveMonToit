@@ -38,6 +38,9 @@ class Caracteristique
     #[ORM\Column(type: Types::DECIMAL, precision: 7, scale: 2)]
     private ?string $surface_terrain = null;
 
+    #[ORM\OneToOne(mappedBy: 'caracteristiques', cascade: ['persist', 'remove'])]
+    private ?Annonce $annonce = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -135,6 +138,23 @@ class Caracteristique
     public function setSurfaceTerrain(string $surface_terrain): static
     {
         $this->surface_terrain = $surface_terrain;
+
+        return $this;
+    }
+
+    public function getAnnonce(): ?Annonce
+    {
+        return $this->annonce;
+    }
+
+    public function setAnnonce(Annonce $annonce): static
+    {
+        // set the owning side of the relation if necessary
+        if ($annonce->getCaracteristiques() !== $this) {
+            $annonce->setCaracteristiques($this);
+        }
+
+        $this->annonce = $annonce;
 
         return $this;
     }

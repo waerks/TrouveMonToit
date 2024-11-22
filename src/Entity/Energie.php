@@ -29,6 +29,9 @@ class Energie
     #[ORM\Column]
     private ?bool $panneaux_solaires = null;
 
+    #[ORM\OneToOne(mappedBy: 'energie', cascade: ['persist', 'remove'])]
+    private ?Annonce $annonce = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -90,6 +93,23 @@ class Energie
     public function setPanneauxSolaires(bool $panneaux_solaires): static
     {
         $this->panneaux_solaires = $panneaux_solaires;
+
+        return $this;
+    }
+
+    public function getAnnonce(): ?Annonce
+    {
+        return $this->annonce;
+    }
+
+    public function setAnnonce(Annonce $annonce): static
+    {
+        // set the owning side of the relation if necessary
+        if ($annonce->getEnergie() !== $this) {
+            $annonce->setEnergie($this);
+        }
+
+        $this->annonce = $annonce;
 
         return $this;
     }

@@ -31,6 +31,9 @@ class Localisation
     #[ORM\Column(length: 255)]
     private ?string $zone = null;
 
+    #[ORM\OneToOne(mappedBy: 'localisation', cascade: ['persist', 'remove'])]
+    private ?Annonce $annonce = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -104,6 +107,23 @@ class Localisation
     public function setZone(string $zone): static
     {
         $this->zone = $zone;
+
+        return $this;
+    }
+
+    public function getAnnonce(): ?Annonce
+    {
+        return $this->annonce;
+    }
+
+    public function setAnnonce(Annonce $annonce): static
+    {
+        // set the owning side of the relation if necessary
+        if ($annonce->getLocalisation() !== $this) {
+            $annonce->setLocalisation($this);
+        }
+
+        $this->annonce = $annonce;
 
         return $this;
     }
